@@ -1,0 +1,65 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% block content %}
+<div class =" row">
+    <div class="col-lg-3 mx-auto">
+        <div class="list-group">
+    
+            {% comment %} <h2 style = "text-align:center; color: red">Danh Mục</h2> {% endcomment %}
+            <a class="nav-link" href="{% url 'store' %}" style = "text-align:center; color: red; font-size: 2rem;font-weight: 500;" >Danh Mục <span class="sr-only">(current)</span></a>
+    
+            {% for category in categories %}
+            <a href="/?category={{category.id}}"
+                class="list-group-item list-group-item-action btn btn-outline-success ">{{category.name}}</a>
+            {% endfor %}
+        </div>
+        <div class="list-group">
+    
+            <h2 style = "text-align:center; color: red">Phạm Vi Giá</h2>
+            <form id="search-form">
+                
+                <select name="price_range">
+                    <option value="0">Tất cả giá</option>
+                    <option value="1">0 - 100.000đ</option>
+                    <option value="2">100.000đ - 500.000đ</option>
+                    <option value="3">500.000đ - 1.000.000đ</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
+            
+        </div>
+    </div>
+    <div id='products' class="col-lg-9 mx-auto">
+        <h2 style = "text-align: center; color: red">Sản Phẩm</h2>
+        {% comment %} {% if category %}
+        <div style="text-align:center">
+            <h2 style="color: Red">{{ category.name }}</h2>
+        </div>
+        {% endif %} {% endcomment %}
+        <div class="row " style="border: 3px solid rgba(0, 0, 0, 0.025)">
+            {% for product in products %}
+                <div class="col-lg-4" >
+                    <img class="thumbnail" src="{{product.imageURL}}">
+                    
+                    <div class="box-element product">
+                        <h6 style="text-align: center"><strong>{{product.name}}</strong></h6>
+                        <hr>
+        
+                        <div style="display: flex; justify-content: space-around">
+                            <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Thêm giỏ hàng</button>
+                            <a class="btn btn-outline-success" href="#">Hiển thị</a>
+                        </div>
+                        <br>
+                        <div >
+                            <h4 style="text-align: center; color: Red">
+                                <strong>{{product.price|floatformat:2}}đ</strong>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

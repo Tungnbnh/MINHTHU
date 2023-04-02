@@ -1,0 +1,34 @@
+{% extends 'store/main.html' %}
+
+{% block content %}
+    <h2>Kết quả tìm kiếm cho "{{ query }}"</h2>
+    <form method="get" class="form-inline">
+        <div class="form-group">
+            <label for="min_price">Giá từ:</label>
+            <input type="number" name="min_price" id="min_price" class="form-control" value="{{ min_price }}">
+        </div>
+        <div class="form-group">
+            <label for="max_price">đến:</label>
+            <input type="number" name="max_price" id="max_price" class="form-control" value="{{ max_price }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Lọc</button>
+    </form>
+    {% if products %}
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <img class="card-img-top" src="{{ product.imageURL }}" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.price }} đ</p>
+                            <a href="{% url 'store:product_detail' product.id %}" class="btn btn-primary">Chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Không tìm thấy sản phẩm nào</p>
+    {% endif %}
+{% endblock %}
