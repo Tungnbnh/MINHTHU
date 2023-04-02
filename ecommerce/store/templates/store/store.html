@@ -6,7 +6,7 @@
         <div class="list-group">
     
             {% comment %} <h2 style = "text-align:center; color: red">Danh Mục</h2> {% endcomment %}
-            <a class="nav-link" href="{% url 'store' %}" style = "text-align:center; color: red; font-size: 2rem;font-weight: 500;" >Danh Mục <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="{% url 'store' %}" style = "text-align:center; color: red; font-size: 2rem;font-weight: 500;" >Danh Mục Sản Phẩm <span class="sr-only">(current)</span></a>
     
             {% for category in categories %}
             <a href="/?category={{category.id}}"
