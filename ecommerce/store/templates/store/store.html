@@ -6,27 +6,26 @@
         <div class="list-group">
     
             {% comment %} <h2 style = "text-align:center; color: red">Danh Mục</h2> {% endcomment %}
-            <a class="nav-link" href="{% url 'store' %}" style = "text-align:center; color: red; font-size: 2rem;font-weight: 500;" >Danh Mục Sản Phẩm <span class="sr-only">(current)</span></a>
+            <h2 class="category-link" href="{% url 'store' %}" style = "text-align:center;  font-size: 2rem;font-weight: 500;" >Danh Mục  <span class="sr-only">(current)</span></h2>
     
             {% for category in categories %}
-            <a href="/?category={{category.id}}"
+            <a href="/?category={{category.id}}" style = "border: none; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; "
                 class="list-group-item list-group-item-action btn btn-outline-success ">{{category.name}}</a>
             {% endfor %}
         </div>
-        <div class="list-group">
+        <div class="list-group" style = "background-color: white; margin-top: 50px " >
     
-            <h2 style = "text-align:center; color: red">Phạm Vi Giá</h2>
-            <form id="search-form">
+            <h2 style = "text-align:center; color: red; margin-bottom: 10px" >Phạm Vi Giá</h2>
+            <form id="search-form"   >
                 
-                <select name="price_range">
-                    <option value="0">Tất cả giá</option>
+                <select name="price_range" style = "margin-left: 10px" >
+                    <option value="0" >Tất cả giá</option>
                     <option value="1">0 - 100.000đ</option>
                     <option value="2">100.000đ - 500.000đ</option>
                     <option value="3">500.000đ - 1.000.000đ</option>
                 </select>
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                <button type="submit" class="btn btn-primary" style = "margin-top: 10px; margin-left: 10px" >Tìm kiếm</button>
             </form>
-            
         </div>
     </div>
     <div id='products' class="col-lg-9 mx-auto">
@@ -39,8 +38,11 @@
         <div class="row " style="border: 3px solid rgba(0, 0, 0, 0.025)">
             {% for product in products %}
                 <div class="col-lg-4" >
-                    <img class="thumbnail" src="{{product.imageURL}}">
                     
+                    <img style = "height: 230px; position: relative;  " class="thumbnail" src="{{product.imageURL}}">
+                    <a href="">
+                        <i class="fa-solid fa-heart" style = "margin-top: 5px;color:black; right: 25px; position: absolute; display: inline-block;" ></i>
+                    </a>
                     <div class="box-element product">
                         <h6 style="text-align: center"><strong>{{product.name}}</strong></h6>
                         <hr>
@@ -59,7 +61,51 @@
                 </div>
             {% endfor %}
         </div>
+        {% comment %} PHÂN TRANG {% endcomment %}
+        <div>
+            {% if products.has_other_pages %}
+    <nav style = "margin-top: 40px; margin-left: 5px">
+        <ul class="pagination justify-content-center">
+            {% if products.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; Đầu tiên</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.previous_page_number }}">&lsaquo; Trước</a>
+            </li>
+            {% endif %}
+            
+            {% for i in products.paginator.page_range %}
+                {% if products.number == i %}
+                <li class="page-item active">
+                    <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                </li>
+                {% elif i > products.number|add:"-3" and i < products.number|add:"3" %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.next_page_number }}">Tiếp &rsaquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ products.paginator.num_pages }}">&raquo; Cuối cùng</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+        </div>
+
     </div>
 </div>
+
+
+
 {% endblock content %}
+
+
 

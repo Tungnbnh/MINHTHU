@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import *
+from django.shortcuts import redirect
 import json
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 
 
@@ -61,7 +63,18 @@ def store(request):
                 products = products.filter(price__gt=100000, price__lte=500000)
             elif price_range == '3':
                 products = products.filter(price__gt=500000, price__lte=1000000)
-
+                
+    paginator = Paginator(products, 6)  # Giới hạn 10 sản phẩm trên mỗi trang
+    page = request.GET.get('page')
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        # Nếu page không phải là số nguyên, trả về trang đầu tiên
+        products = paginator.page(1)
+    except EmptyPage:
+        # Nếu page lớn hơn số trang có sẵn, trả về trang cuối cùng
+        products = paginator.page(paginator.num_pages)
+    
     context = {'products': products, 'categories': categories, 'category': category, 'cartItems':cartItems}
     
     
@@ -132,3 +145,7 @@ def updateItem(request):
     response = {'cartItems': cartItems}
     return JsonResponse('Item was added', safe = False)
 
+def remove_from_cart(request, id):
+    item = OrderItem.objects.get(id=id)
+    item.delete()
+    return redirect('cart')
