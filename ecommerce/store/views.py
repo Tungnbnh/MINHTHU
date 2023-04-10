@@ -149,3 +149,8 @@ def remove_from_cart(request, id):
     item = OrderItem.objects.get(id=id)
     item.delete()
     return redirect('cart')
+
+
+def login_user(request):
+    context = {}
+    return render(request, "store/login.html", context)

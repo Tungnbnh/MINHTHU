@@ -1,9 +1,9 @@
 {% extends 'store/main.html' %}
 {% load static %}
 {% block content %}
-<div class =" row">
-    <div class="col-lg-3 mx-auto">
-        <div class="list-group">
+<div class =" row" >
+    <div class="col-lg-3 mx-auto" style = "margin-right: 50px">
+        <div class="list-group" style = "float" >
     
             {% comment %} <h2 style = "text-align:center; color: red">Danh Mục</h2> {% endcomment %}
             <h2 class="category-link" href="{% url 'store' %}" style = "text-align:center;  font-size: 2rem;font-weight: 500;" >Danh Mục  <span class="sr-only">(current)</span></h2>
@@ -48,7 +48,7 @@
                         <hr>
         
                         <div style="display: flex; justify-content: space-around">
-                            <button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Thêm giỏ hàng</button>
+                            <button data-product="{{product.id}}" data-action="add" class="btn search-button btn-outline-secondary add-btn update-cart">Thêm giỏ hàng</button>
                             <a class="btn btn-outline-success" href="#">Hiển thị</a>
                         </div>
                         <br>

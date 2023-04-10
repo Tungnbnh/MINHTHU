@@ -1,0 +1,36 @@
+.contact {
+    display: flex;
+    justify-content: space-between;
+    background-color: #FFF5EE!important;
+    min-height: 40px;
+    align-items: center;
+}
+
+.contact-right {
+    margin-left: 50px;
+    display: block;
+    display: flex;
+}
+
+.contact-right div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 30px;
+}
+
+.contact-right div p {
+    color: black;
+    margin: auto;
+    margin-left: 10px;
+    font-family: Roboto, sans-serif;
+}
+
+.contact-left {
+    margin-right: 70px;
+}
+
+.fab {
+    color: black;
+    margin-left: 20px;
+}

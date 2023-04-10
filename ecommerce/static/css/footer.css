@@ -1,0 +1,10 @@
+.footer {
+    background-color: #252525;
+}
+
+.footer h6 {
+    margin-top: 50px;
+    font-size: 24px;
+    color: white;
+    text-transform: uppercase;
+}
