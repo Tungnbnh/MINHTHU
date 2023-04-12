@@ -1,5 +1,6 @@
 {% extends 'store/main.html' %}
 {% load static %}
+{% load humanize %}
 {% block content %}
      <div class="row">
 		<div class="col-lg-6">
@@ -57,12 +58,12 @@
 				<div class="cart-row">
 					<div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
 					<div style="flex:2"><p>{{item.product.name}}</p></div>
-					<div style="flex:1"><p>{{item.product.price}}</p></div>
+					<div style="flex:1"><p>{{item.product.price|floatformat|intcomma}} đ</p></div>
 					<div style="flex:1"><p>x{{item.quantity}}</p></div>
 				</div>
 				{% endfor %}
 				<h5 style = "color: red">Items: {{order.get_cart_items}}</h5>
-				<h5 style = "color: red">Total: {{order.get_cart_total}}đ</h5>
+				<h5 style = "color: red">Total: {{order.get_cart_total|floatformat|intcomma}} đ</h5>
 			</div>
 		</div>
 	</div>

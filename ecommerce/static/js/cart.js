@@ -1,6 +1,6 @@
-document.querySelector(".search-button").addEventListener("click", function() {
-    this.parentNode.classList.toggle("open");
-});
+// document.querySelector(".search-button").addEventListener("click", function() {
+//     this.parentNode.classList.toggle("open");
+// });
 var updateBtns = document.getElementsByClassName("update-cart");
 
 for (i = 0; i < updateBtns.length; i++) {
