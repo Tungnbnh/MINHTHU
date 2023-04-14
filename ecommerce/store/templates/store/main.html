@@ -34,6 +34,32 @@
         return cookieValue;
     }
     var csrftoken = getToken('csrftoken');
+
+
+    function getCookie(name){
+      //tách chuỗi cookie và lấy tất cả các cặp tên=giá trị riêng lẻ trong một mảng
+      var cookieArr = document.cookie.split(";")
+      //lặp qua các phần tử của mảng
+      
+      for(var i = 0; i < cookieArr.length; i++){
+        var cookiePair = cookieArr[i].split("=");
+
+        //xóa khoảng trắng ở đầu tên cookie và so sánh nó với chuỗi đã cho
+
+        if (name == cookiePair[0].trim()){
+          return decodeURIComponent(cookiePair[1]);
+        }
+      }
+      //trả về null nếu không tìm thấy
+      return null;
+    }
+    var cart = JSON.parse(getCookie('cart'))
+    if(cart == undefined){
+      cart = {}
+      console.log('Cart was created!')
+      document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+    }
+    console.log('Cart:',cart)
     </script>
 </head>
 <body>
@@ -84,7 +110,7 @@
           </form>
           {% comment %} Gio Hang va Dang Nhap {% endcomment %}
           <div class="form-inline my-2 my-lg-0">
-            <a href="{% url 'login' %}" class="btn btn-warning" style="border-radius: 50%"><i class="fas fa-user-circle" ></i></a>
+            <a href="" class="btn btn-warning" style="border-radius: 50%"><i class="fas fa-user-circle" ></i></a>
             
             <a href="{% url 'cart' %}">
                <img  id="cart-icon" src="{% static 'images/cart.png' %}">
@@ -133,40 +159,7 @@
     
     <!-- Footer -->
   <footer class="text-center text-lg-start bg-light text-muted">
-    <!-- Section: Social media -->
-    {% comment %} <section class=" footer d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
-      <!-- Left -->
-      <div class="me-5 d-none d-lg-block">
-        <span>Kết nối với chúng tôi trên các mạng xã hội:</span>
-      </div>
-      <!-- Left -->
-  
-      <!-- Right -->
-      <div >
-        <a style = "margin-right: 20px" href="" class="me-4 text-reset">
-          <i class="fab fa-facebook-f"></i>
-        </a>
-        <a style = "margin-right: 20px" href="" class="me-4 text-reset">
-          <i class="fab fa-twitter"></i>
-        </a>
-        <a style = "margin-right: 20px" href="" class="me-4 text-reset">
-          <i class="fab fa-google"></i>
-        </a>
-        <a style = "margin-right: 20px" href="" class="me-4 text-reset">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a style = "margin-right: 20px" href="" class="me-4 text-reset">
-          <i class="fab fa-linkedin"></i>
-        </a>
-        <a style = "margin-right: 20px" href="" class="me-4 text-reset">
-          <i class="fab fa-github"></i>
-        </a>
-      </div>
-      <!-- Right -->
-    </section> {% endcomment %}
-    <!-- Section: Social media -->
-  
-    <!-- Section: Links  -->
+    
     <section class = "footer">
       <div class="container text-center text-md-start mt-5">
         <!-- Grid row -->

@@ -97,6 +97,10 @@ h6 {
     opacity: 0.6;
 }
 
+.hidden {
+    display: none!important;
+}
+
 
 /* .carousel-caption {
   position: absolute;

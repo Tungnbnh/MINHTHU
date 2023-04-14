@@ -47,11 +47,18 @@
 					</div>
 					<div style="flex:1"><p>{{item.get_total|floatformat:0|intcomma}} đ</p></div>
 					<div>
-						<form method="POST" action="{% url 'remove-from-cart' item.id %}">
-							{% csrf_token %}
-							<button type="submit" style = "border: none; background: none" ><i style = "color: red" class="fa-sharp fa-solid fa-trash"></i></button>
-						</form>
+						{% if item.id %}
+							<form method="POST" action="{% url 'remove-from-cart' item_id=item.id %}">
+								{% csrf_token %}
+								<input type="hidden" name="item_id" value="{{ item.id }}">
+								<button type="submit" style="border: none; background: none">
+									<i style="color: red" class="fa fa-trash"></i>
+								</button>
+							</form>
+						{% endif %}
 					</div>
+					
+					
 				</div>
 				{% endfor %}
 

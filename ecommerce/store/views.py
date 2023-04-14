@@ -2,17 +2,13 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .models import *
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
 import json
+import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 
-
-
-# def store(request):
-#      products = Product.objects.all()
-#      categories = Category.objects.all()
-#      context = {'products': products, 'categories': categories}
-#      return render(request, 'store/store.html', context)
 def store(request):
     category_id = request.GET.get('category')
     if category_id:
@@ -31,24 +27,13 @@ def store(request):
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         cartItems = order.get_cart_items
     else:
+        items = []
         cartItems = 0
+        order = {'get_cart_total': 0, 'cartItems':cartItems,'shipping': False}
+       
 
     categories = Category.objects.all()
     
-    
-    # Xử lý yêu cầu tìm kiếm sản phẩm
-    # query = request.GET.get('q')
-    # min_price = request.GET.get('min_price')
-    # max_price = request.GET.get('max_price')
-
-    # if query:
-    #     products = products.filter(name__icontains=query)
-
-    # if min_price:
-    #     products = products.filter(price__gte=min_price)
-
-    # if max_price:
-    #     products = products.filter(price__lte=max_price)
     
     if 'q' in request.GET:
         query = request.GET['q']
@@ -93,9 +78,41 @@ def cart(request):
         cartItems = order.get_cart_items
         #truy xuat tat ca cac muc trong don dat hang bang phuong thuc orderitem_set.all()
     else:
+        try:
+             cart = json.loads(request.COOKIES['cart'])
+        except:
+            cart = {}
+        
         items = []
-        order = {'get_cart_items':0, 'get_cart_total':0}
+        order = {'get_cart_items':0, 'get_cart_total':0,'shipping': False}
         cartItems = order['get_cart_items']
+
+        for i in cart:
+            cartItems += cart[i]["quantity"]
+            
+            product = Product.objects.get(id = i)
+            
+            total = (product.price * cart[i]["quantity"])
+            
+            order['get_cart_total'] += total
+            order['get_cart_items'] += cart[i]["quantity"]
+            
+            item = {
+            'product':{
+                'id':product.id,
+                'name':product.name,
+                'price': product.price,
+                'imageURL': product.imageURL,
+            },
+            'quantity':cart[i]["quantity"],
+            'get_total':total
+            }
+            items.append(item)
+
+            
+            
+           
+  
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/cart.html', context)
 
@@ -112,7 +129,7 @@ def checkout(request):
         #truy xuat tat ca cac muc trong don dat hang bang phuong thuc orderitem_set.all()
     else:
         items = []
-        order = {'get_cart_items':0, 'get_cart_total':0}
+        order = {'get_cart_items':0, 'get_cart_total':0,'shipping': False}
         cartItems = order['get_cart_items']
     context = {'items': items, 'order': order,'cartItems': cartItems}
     return render(request, 'store/checkout.html', context)
@@ -145,12 +162,36 @@ def updateItem(request):
     response = {'cartItems': cartItems}
     return JsonResponse('Item was added', safe = False)
 
-def remove_from_cart(request, id):
-    item = OrderItem.objects.get(id=id)
+
+# Xoá sản phẩm khi khách hàng đã đăng nhập
+def remove_from_cart(request, item_id):
+    item = OrderItem.objects.get(id=item_id)
     item.delete()
     return redirect('cart')
 
-
-def login_user(request):
-    context = {}
-    return render(request, "store/login.html", context)
+def processOrder(request):
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer = customer, complete = False)
+        total = float(data['form']['total'])
+        order.transaction_id = transaction_id
+        
+        if total == order.get_cart_total:
+            order.complete = True
+        order.save()
+        
+        if order.shipping == True:
+            ShippingAddree.objects.create(
+                customer = customer,
+                order = order,
+                address = data['shipping']['address'],
+                city = data['shipping']['city'],
+                state = data['shipping']['state'],
+                zip_code = data['shipping']['zip_code'],
+                
+            )
+    else:
+        print('User is not logged in...')
+    return JsonResponse('Payment complete!', safe = False)

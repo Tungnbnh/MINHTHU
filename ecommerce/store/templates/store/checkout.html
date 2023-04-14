@@ -8,10 +8,10 @@
 				<form id="form">
 					<div id="user-info">
 						<div class="form-field">
-							<input required class="form-control" type="text" name="name" placeholder="Tên..">
+							<input required class="form-control" type="text" id="name" name="name" placeholder="Tên..">
 						</div>
 						<div class="form-field">
-							<input required class="form-control" type="email" name="email" placeholder="Email..">
+							<input required class="form-control" type="email" id="email" name="email" placeholder="Email..">
 						</div>
 					</div>
 					
@@ -20,19 +20,19 @@
 						<p>Thông tin vận chuyển:</p>
 						<hr>
 						<div class="form-field">
-							<input class="form-control" type="text" name="address" placeholder="Địa chỉ..">
+							<input class="form-control" type="text" id="address" name="address" placeholder="Địa chỉ..">
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="city" placeholder="Thành Phố..">
+							<input class="form-control" type="text" id="city" name="city" placeholder="Thành Phố..">
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="state" placeholder="Tình Trạng..">
+							<input class="form-control" type="text" id="state" name="state" placeholder="Tình Trạng..">
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="zipcode" placeholder="Mã vùng..">
+							<input class="form-control" type="text" id="zip_code" name="zip_code" placeholder="Mã vùng..">
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="country" placeholder="Zip code..">
+							<input class="form-control" type="text" id="country" name="country" placeholder="Zip code..">
 						</div>
 					</div>
 
@@ -40,10 +40,11 @@
 					<input id="form-button" class="btn btn-success btn-block" type="submit" value="Tiếp Tục">
 				</form>
 			</div>
-
 			<br>
+
 			<div class="box-element hidden" id="payment-info">
 				<small>Paypal Options</small>
+				<button id = "make-payment">Make Payment</button>
 			</div>
 			
 		</div>
@@ -67,4 +68,83 @@
 			</div>
 		</div>
 	</div>
+
+
+	<script type="text/javascript">
+		var shipping = '{{order.shipping}}'
+		var total = '{{order.get_cart_total}}'
+		if(shipping == 'False'){
+			document.getElementById('shipping-info').innerHTML = ''
+		}
+		
+		if(user != 'AnonymousUser'){
+			document.getElementById('user-info').innerHTML = ''
+		} 
+
+		if(shipping == 'False' && user != 'AnonymousUser'){
+			document.getElementById('form-wrapper').classList.add("hidden");
+			document.getElementById('payment-info').classList.remove("hidden");
+		}
+
+		var form = document.getElementById('form')
+		
+		form.addEventListener('submit',function(e){
+			e.preventDefault()
+			console.log('Form Submitted...')
+			document.getElementById('form-button').classList.add('hidden')
+			document.getElementById('payment-info').classList.remove('hidden');
+			
+			})
+
+
+		document.getElementById('make-payment').addEventListener('click', function(e){
+			submitFormData()
+		})
+
+		function submitFormData(){
+			console.log('Payment button clicked')
+
+			var userFormData = {
+				'name': null,
+				'email':null,
+				'total': total,
+			}
+			var shippingInfo = {
+				'address': null,
+				'city':null,
+				'state': null,
+				'zip_code': null,
+
+			}
+			if(shipping != 'False'){
+				shippingInfo.address = document.getElementById('address').value;
+				shippingInfo.city = document.getElementById('city').value;
+				shippingInfo.state = document.getElementById('state').value;
+				shippingInfo.zip_code = document.getElementById('zip_code').value;
+			}
+			if(user == 'AnonymousUser'){
+				userFormData.name = document.getElementById('name').value;
+				userFormData.email = document.getElementById('email').value;
+				
+			}
+			console.log('shipping Info:', shippingInfo)
+			console.log('User Info:', userFormData)
+			var url = '/process_order/'
+			fetch(url,{
+				method:'POST',
+				headers:{
+					'Content-Type':'application/json',
+					'X-CSRFToken': csrftoken,
+				},
+				body:JSON.stringify({'form':userFormData, 'shipping':shippingInfo})
+			})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log('Success:', data);
+				alert('Transaction completed');
+				window.location.href = "{% url 'store' %}"
+			})
+		}
+		
+	</script>
 {% endblock content %}

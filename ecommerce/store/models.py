@@ -30,7 +30,7 @@ class Product(models.Model):
     name = models.CharField(max_length= 200, null= True)
     price = models.FloatField()
     category = models.ForeignKey(Category, null= True, on_delete=models.SET_NULL, blank= True)
-    digital = models.BooleanField(default= True, null = True, blank= True)
+    digital = models.BooleanField(default= False, null = True, blank= False)
     #Digital: xem san pham co phai la hang dien tu hay ko de co the duoc van chuyen dung cach
     #Image
     image = models.ImageField(null=True, blank= True)
@@ -39,6 +39,9 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     # neu ko co hinh anh duoc them vao thi co the bo qua 
+
+    
+    
     @property
     def imageURL(self):
         try:
@@ -69,7 +72,14 @@ class Order(models.Model):
     
     def __str__(self):
         return str(self.id)
-    
+    @property
+    def shipping(self):
+        shipping = False
+        orderitems = self.orderitem_set.all()
+        for i in orderitems:
+            if i.product.digital == False:
+                shipping = True
+        return shipping
     @property
     def get_cart_total(self):
         orderitems = self.orderitem_set.all()
