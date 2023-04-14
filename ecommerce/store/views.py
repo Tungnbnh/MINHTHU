@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 
 import json
+from . utils import cookieCart, cartData, guestOrder
 import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
@@ -22,14 +23,10 @@ def store(request):
         products = Product.objects.all()
     
      
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        cartItems = order.get_cart_items
-    else:
-        items = []
-        cartItems = 0
-        order = {'get_cart_total': 0, 'cartItems':cartItems,'shipping': False}
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
        
 
     categories = Category.objects.all()
@@ -67,70 +64,21 @@ def store(request):
     return render(request, 'store/store.html', context)
 
 def cart(request):
-    if request.user.is_authenticated:#kiem tra xem nguoi dung da dang nhap vao trang web hay chua
-        customer = request.user.customer#truy xuat doi tuong khach hang duoc lien ket voi nguoi dung
-        order, created = Order.objects.get_or_create(customer = customer, complete = False)
-        #Truy xuat mot don hang chua hoan chinh cho doi tuong khach hang cua nguoi dung da duoc xac thuc
-        #Neu mot don hang nhu vay da ton tai thì sẽ lấy nó
-        #Nếu không nó sẽ tạo một đơn đặt hàng mới với Plete được đặt thành false
-        #Phương thức get_ỏ_create() trả về một bộ chứa đối tượng đươn hàng và một giá trị boolean cho biết đơn hàng đã được tạo hay truy xuất
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-        #truy xuat tat ca cac muc trong don dat hang bang phuong thuc orderitem_set.all()
-    else:
-        try:
-             cart = json.loads(request.COOKIES['cart'])
-        except:
-            cart = {}
-        
-        items = []
-        order = {'get_cart_items':0, 'get_cart_total':0,'shipping': False}
-        cartItems = order['get_cart_items']
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
 
-        for i in cart:
-            cartItems += cart[i]["quantity"]
-            
-            product = Product.objects.get(id = i)
-            
-            total = (product.price * cart[i]["quantity"])
-            
-            order['get_cart_total'] += total
-            order['get_cart_items'] += cart[i]["quantity"]
-            
-            item = {
-            'product':{
-                'id':product.id,
-                'name':product.name,
-                'price': product.price,
-                'imageURL': product.imageURL,
-            },
-            'quantity':cart[i]["quantity"],
-            'get_total':total
-            }
-            items.append(item)
-
-            
-            
-           
-  
     context = {'items': items, 'order': order, 'cartItems': cartItems}
     return render(request, 'store/cart.html', context)
 
 def checkout(request):
-    if request.user.is_authenticated:#kiem tra xem nguoi dung da dang nhap vao trang web hay chua
-        customer = request.user.customer#truy xuat doi tuong khach hang duoc lien ket voi nguoi dung
-        order, created = Order.objects.get_or_create(customer = customer, complete = False)
-        #Truy xuat mot don hang chua hoan chinh cho doi tuong khach hang cua nguoi dung da duoc xac thuc
-        #Neu mot don hang nhu vay da ton tai thì sẽ lấy nó
-        #Nếu không nó sẽ tạo một đơn đặt hàng mới với Plete được đặt thành false
-        #Phương thức get_ỏ_create() trả về một bộ chứa đối tượng đươn hàng và một giá trị boolean cho biết đơn hàng đã được tạo hay truy xuất
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-        #truy xuat tat ca cac muc trong don dat hang bang phuong thuc orderitem_set.all()
-    else:
-        items = []
-        order = {'get_cart_items':0, 'get_cart_total':0,'shipping': False}
-        cartItems = order['get_cart_items']
+    
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
+
     context = {'items': items, 'order': order,'cartItems': cartItems}
     return render(request, 'store/checkout.html', context)
 def updateItem(request):
@@ -168,6 +116,13 @@ def remove_from_cart(request, item_id):
     item = OrderItem.objects.get(id=item_id)
     item.delete()
     return redirect('cart')
+def remove_from_cart_guest(request, item_id):
+    guest_cart = request.session.get('guest_cart', {})
+    if item_id in guest_cart:
+        del guest_cart[item_id]
+        request.session['guest_cart'] = guest_cart
+    return redirect('cart')
+
 
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
@@ -175,23 +130,25 @@ def processOrder(request):
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer = customer, complete = False)
-        total = float(data['form']['total'])
-        order.transaction_id = transaction_id
+         
         
-        if total == order.get_cart_total:
-            order.complete = True
-        order.save()
-        
-        if order.shipping == True:
-            ShippingAddree.objects.create(
-                customer = customer,
-                order = order,
-                address = data['shipping']['address'],
-                city = data['shipping']['city'],
-                state = data['shipping']['state'],
-                zip_code = data['shipping']['zip_code'],
-                
-            )
+            
     else:
-        print('User is not logged in...')
+        customer, order = guestOrder(request, data)
+        
+    total = float(data['form']['total'])
+    order.transaction_id = transaction_id
+        
+    if total == order.get_cart_total:
+        order.complete = True
+    order.save() 
+    if order.shipping == True:
+        ShippingAddree.objects.create(
+            customer = customer,
+            order = order,
+            address = data['shipping']['address'],
+            city = data['shipping']['city'],
+            state = data['shipping']['state'],
+            zip_code = data['shipping']['zip_code'],
+        )   
     return JsonResponse('Payment complete!', safe = False)
