@@ -1,0 +1,59 @@
+{% extends 'store/main.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+<h1 style = "text-align: center; color: #E88F2A">Chi tiết sản phẩm</h1>
+
+
+<div class = "row">
+  <div class = "col-lg-6 mx-auto">
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+  </div>
+  <div class = "col-lg-6 mx-auto">
+    <div>
+      <h2>{{ product.name }}</h2>
+    </div>
+    <div style = "padding: 15px 20px;display: flex;">
+      <p style = "color: #d0011b;font-weight: 500;  font-size: 1.875rem">Giá: {{ product.price|floatformat|intcomma}}</p>
+    </div>
+    <div class="flex" style="display: flex; padding-bottom:25px">
+      <label style="color: #757575; width: 110px">Bảo hiểm</label>
+      <div class = "flex item-center">
+        <div style="color: #222">Bảo vệ quyền lợi người tiêu dùng</div>
+      </div>
+    </div>
+    <div class="flex" style="display: flex; padding-bottom:25px">
+      <label style="color: #757575; width: 110px">Điều kiện</label>
+      <div class = "flex item-center">
+        <div style="color: #222">Còn hàng</div>
+      </div>
+    </div>
+    <div class="flex" style="display: flex; padding-bottom:25px">
+      <label style="color: #757575; width: 110px">Tình trạng</label>
+      <div class = "flex item-center">
+        <div style="color: #222">Còn mới</div>
+      </div>
+    </div>
+    <div class="flex" style="display: flex; padding-bottom:25px">
+      <label style="color: #757575; width: 110px">Vận chuyển</label>
+      <div class = "flex item-center">
+        <div style="color: #222">Xử lý đơn hàng bởi shoppee</div>
+      </div>
+    </div>
+
+    
+    <button style="background: #ee4d2d; color: white" data-product="{{product.id}}" data-action="add" class="btn search-button btn-outline-secondary add-btn update-cart">Thêm Vào Giỏ Hàng </button>
+  </div>
+</div>
+<div class="col-lg-12" >
+  <div style = "background-color: red">
+    <h1>Mô tả</h1>
+  </div>
+  
+  <div>
+    <p>Mô tả: {{ product.description }}</p>
+  </div>
+</div>
+
+{% endblock content %}

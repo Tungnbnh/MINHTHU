@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+
+from django.http import JsonResponse,HttpResponseNotFound
 from .models import *
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
@@ -62,6 +63,19 @@ def store(request):
     
     
     return render(request, 'store/store.html', context)
+
+# def product_detail(request):
+#     context = {}
+#     return render(request, 'store/product_detail.html', context)
+def detail(request, pk):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
+    
+    product = get_object_or_404(Product, pk=pk)
+    context = {'items': items, 'order': order, 'cartItems': cartItems, 'product': product}
+    return render(request, 'store/detail.html', context)
 
 def cart(request):
     data = cartData(request)
@@ -131,8 +145,6 @@ def processOrder(request):
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer = customer, complete = False)
          
-        
-            
     else:
         customer, order = guestOrder(request, data)
         
@@ -152,3 +164,4 @@ def processOrder(request):
             zip_code = data['shipping']['zip_code'],
         )   
     return JsonResponse('Payment complete!', safe = False)
+

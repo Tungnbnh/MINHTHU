@@ -50,7 +50,11 @@
         
                         <div style="display: flex; justify-content: space-around">
                             <button data-product="{{product.id}}" data-action="add" class="btn search-button btn-outline-secondary add-btn update-cart">Thêm giỏ hàng</button>
-                            <a class="btn btn-outline-success" href="#">Hiển thị</a>
+                            {% comment %} <a href = '{% url 'product_detail' %}'  class="btn btn-outline-success">Hiển thị</a> {% endcomment %}
+                            <a href="{% url 'detail' pk=product.id %}" class="btn btn-outline-success">Chi Tiết</a>
+
+
+
                         </div>
                         <br>
                         <div >
@@ -100,11 +104,19 @@
     </nav>
 {% endif %}
         </div>
-
     </div>
 </div>
 
-
+<script>
+    document.querySelectorAll('.show-product-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.id;
+            const url = `/detail/${productId}/`;
+            window.location.href = url;
+        });
+    });
+    
+</script>
 
 {% endblock content %}
 

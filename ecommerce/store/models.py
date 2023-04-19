@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.urls import reverse
+from django.utils.html import format_html
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
@@ -26,6 +27,13 @@ class Category(models.Model):
         return self.name
     
     
+    def get_products(self):
+        return Product.objects.filter(category=self)
+   
+   
+    
+    
+    
 class Product(models.Model):
     name = models.CharField(max_length= 200, null= True)
     price = models.FloatField()
@@ -33,6 +41,8 @@ class Product(models.Model):
     digital = models.BooleanField(default= False, null = True, blank= False)
     #Digital: xem san pham co phai la hang dien tu hay ko de co the duoc van chuyen dung cach
     #Image
+    description = models.TextField(null=True, blank=True)
+    
     image = models.ImageField(null=True, blank= True)
     
     
@@ -96,6 +106,10 @@ class Order(models.Model):
         total = sum([item.quantity for item in orderitems])
         return total
     
+    def get_shipping_addresses(self):
+        shipping_addresses = ShippingAddree.objects.filter(order=self)
+        return shipping_addresses
+    
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, null=True, on_delete=models.SET_NULL, blank=True)
     product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL, blank=True)
@@ -106,6 +120,10 @@ class OrderItem(models.Model):
     def get_total(self):
         total = self.product.price * self.quantity
         return total
+    #xem chi tiet order
+    @staticmethod
+    def get_order_items_by_order(order_id):
+        return OrderItem.objects.filter(order_id=order_id)
     
     
 class ShippingAddree(models.Model):
@@ -117,7 +135,10 @@ class ShippingAddree(models.Model):
     zip_code = models.CharField(max_length= 200, null= True)
     date_added = models.DateTimeField(auto_now_add= True)
     
+    
     def __str__(self):
         return self.address
-
+    def get_order_items(self):
+        order_items = OrderItem.objects.filter(order=self.order)
+        return order_items
 
