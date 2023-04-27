@@ -17,7 +17,24 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Customer)
 # admin.site.register(Category)
 admin.site.register(Product)
-admin.site.register(Order)
+
+class OrderAdmin(admin.ModelAdmin):
+    def customer_name(self, obj):
+        return obj.customer.name if obj.customer else None
+    customer_name.short_description = 'Khách hàng'
+    
+    def date_ordered(self, obj):
+        return obj.date_ordered
+    date_ordered.short_description = 'Ngày đặt hàng'
+    
+    def detail(self, obj):
+        url = reverse('view_order', args=[obj.pk])
+        return format_html('<a class="button" href="{}">Xem chi tiết</a>', url)
+    detail.short_description = 'Chi tiết'
+    
+    list_display = ['id', 'customer_name', 'date_ordered', 'detail']
+
+admin.site.register(Order, OrderAdmin)
 # admin.site.register(OrderItem)
 # admin.site.register(ShippingAddree)
 

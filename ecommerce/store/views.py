@@ -165,3 +165,52 @@ def processOrder(request):
         )   
     return JsonResponse('Payment complete!', safe = False)
 
+# def view_order(request, pk):
+#     order = get_object_or_404(Order, pk=pk)
+#     order_items = OrderItem.objects.filter(order = order)
+#     products = Product.objects.all()
+
+#     if request.method == 'POST':
+#         product_id = request.POST.get('product_id')
+#         product = get_object_or_404(Product, id=product_id)
+#         order_item, created = OrderItem.objects.get(order=order, product=product)
+
+#         if not created:
+#             order_item.quantity += 1
+#             order_item.save()
+
+#     context = {
+#         'order': order,
+#         'order_items': order_items,
+#         'products': products,
+#     }
+#     return render(request, 'store/view_order.html', context)
+
+def view_order(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    order_items = OrderItem.objects.filter(order=order)
+    products = Product.objects.all()
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Product, id=product_id)
+
+        # Kiểm tra xem OrderItem đã tồn tại hay chưa
+        order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
+
+        # Nếu đã tồn tại, cập nhật số lượng sản phẩm thêm vào
+        if not created:
+            order_item.quantity += 1
+            order_item.save()
+
+        # Nếu chưa tồn tại, tạo một OrderItem mới với số lượng sản phẩm là 1
+        else:
+            new_order_item = OrderItem(order=order, product=product, quantity=1)
+            new_order_item.save()
+
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'products': products,
+    }
+    return render(request, 'store/view_order.html', context)
