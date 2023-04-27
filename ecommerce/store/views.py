@@ -165,29 +165,9 @@ def processOrder(request):
         )   
     return JsonResponse('Payment complete!', safe = False)
 
-# def view_order(request, pk):
-#     order = get_object_or_404(Order, pk=pk)
-#     order_items = OrderItem.objects.filter(order = order)
-#     products = Product.objects.all()
 
-#     if request.method == 'POST':
-#         product_id = request.POST.get('product_id')
-#         product = get_object_or_404(Product, id=product_id)
-#         order_item, created = OrderItem.objects.get(order=order, product=product)
-
-#         if not created:
-#             order_item.quantity += 1
-#             order_item.save()
-
-#     context = {
-#         'order': order,
-#         'order_items': order_items,
-#         'products': products,
-#     }
-#     return render(request, 'store/view_order.html', context)
-
-def view_order(request, pk):
-    order = get_object_or_404(Order, pk=pk)
+def view_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id) # thay pk thành id
     order_items = OrderItem.objects.filter(order=order)
     products = Product.objects.all()
 
@@ -207,6 +187,9 @@ def view_order(request, pk):
         else:
             new_order_item = OrderItem(order=order, product=product, quantity=1)
             new_order_item.save()
+
+    # Truy vấn thông tin sản phẩm trong đơn hàng
+    order_items = order.orderitem_set.all()
 
     context = {
         'order': order,

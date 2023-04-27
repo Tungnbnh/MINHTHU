@@ -1,6 +1,9 @@
-{% for item in order_items %}
+{% comment %} {% for item in order_items %}
   <h3>{{ item.product.name }}</h3>
   <p>Price: {{ item.product.price }}</p>
   <p>Quantity: {{ item.quantity }}</p>
   <p>Total: {{ item.get_total }}</p>
+{% endfor %} {% endcomment %}
+{% for order_item in order_items %}
+    <p>{{ order_item.product.name }} - {{ order_item.quantity }} - {{ order_item.get_total }}</p>
 {% endfor %}

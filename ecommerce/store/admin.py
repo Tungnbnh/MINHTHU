@@ -28,10 +28,11 @@ class OrderAdmin(admin.ModelAdmin):
     date_ordered.short_description = 'Ngày đặt hàng'
     
     def detail(self, obj):
-        url = reverse('view_order', args=[obj.pk])
+        url = reverse('view_order', args=[obj.id])
         return format_html('<a class="button" href="{}">Xem chi tiết</a>', url)
     detail.short_description = 'Chi tiết'
     
+        
     list_display = ['id', 'customer_name', 'date_ordered', 'detail']
 
 admin.site.register(Order, OrderAdmin)
