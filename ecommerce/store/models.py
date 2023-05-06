@@ -121,10 +121,13 @@ class OrderItem(models.Model):
         total = self.product.price * self.quantity
         return total
     #xem chi tiet order
+    # @staticmethod
+    # def get_order_items_by_order(order_id):
+    #     return OrderItem.objects.filter(order_id=order_id)
     @staticmethod
     def get_order_items_by_order(order_id):
-        return OrderItem.objects.filter(order_id=order_id)
-    
+        order_items = OrderItem.objects.filter(order__id=order_id)
+        return order_items
     
 class ShippingAddree(models.Model):
     customer = models.ForeignKey(Customer, null= True, on_delete=models.SET_NULL, blank=True)

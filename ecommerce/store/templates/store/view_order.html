@@ -1,9 +1,38 @@
-{% comment %} {% for item in order_items %}
-  <h3>{{ item.product.name }}</h3>
-  <p>Price: {{ item.product.price }}</p>
-  <p>Quantity: {{ item.quantity }}</p>
-  <p>Total: {{ item.get_total }}</p>
-{% endfor %} {% endcomment %}
-{% for order_item in order_items %}
-    <p>{{ order_item.product.name }} - {{ order_item.quantity }} - {{ order_item.get_total }}</p>
+<h2>Thông tin đơn hàng</h2>
+<p>Mã đơn hàng: {{ order.id }}</p>
+<p>Ngày đặt hàng: {{ order.date_ordered }}</p>
+<p>Khách hàng: {{ customer.name }}</p>
+
+<h3>Địa chỉ giao hàng</h3>
+{% for address in shipping_addresses %}
+    <p>Địa chỉ: {{ address.address }},
+    {{ address.city }},
+     {{ address.state }}
+ </p>
+{% empty %}
+    <p>Chưa có địa chỉ giao hàng</p>
 {% endfor %}
+
+<h3>Danh sách sản phẩm</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá tiền</th>
+            <th>Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order_item in order_items %}
+            <tr>
+                <td>{{ order_item.product.name }}</td>
+                <td>{{ order_item.quantity }}</td>
+                <td>{{ order_item.product.price }}</td>
+                <td>{{ order_item.get_total }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Tổng tiền: {{ order.get_cart_total }}</h3>
