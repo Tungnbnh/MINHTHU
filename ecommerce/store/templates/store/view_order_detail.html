@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;600&family=Roboto:wght@100&display=swap" rel="stylesheet">
+    <title>Document</title>
+    
+</head>
+<body style="font-family: Arial, sans-serif;">
+    {% for order in orders%}
+        <h2>Thong tin don hang</h2>
+        <p>Ma don hang: {{ order.id }}</p>
+        <p>Ngay dat hang: {{ order.date_ordered }}</p>
+        <p>Khach hang: {{ order.customer.name }}</p>
+
+        <h3>Dia chi giao hang</h3>
+        {% for address in order.get_shipping_addresses %}
+            <p>Dia chi: {{ address.address }},
+            {{ address.city }},
+            {{ address.state }}
+        </p>
+        {% empty %}
+            <p>Chưa có địa chỉ giao hàng</p>
+        {% endfor %}
+
+        <h3>Danh sach san pham</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ten san pham</th>
+                    <th>So Luong</th>
+                    <th>Gia tien</th>
+                    <th>Thanh tien</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order_item in order.orderitem_set.all %}
+                    <tr>
+                        <td>{{ order_item.product.name }}</td>
+                        <td>{{ order_item.quantity }}</td>
+                        <td>{{ order_item.product.price }}</td>
+                        <td>{{ order_item.get_total }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Tong tien:{{ order.get_cart_total }}</h3>
+
+    {% endfor %}
+</body>
+</html>

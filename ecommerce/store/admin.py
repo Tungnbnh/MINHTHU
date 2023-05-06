@@ -1,6 +1,13 @@
 from django.contrib import admin
-
 from .models import*
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.urls import reverse
+from django.utils.html import format_html
+from xhtml2pdf import pisa
+from io import BytesIO
+from django.template.loader import render_to_string
+from unidecode import unidecode
 # Register your models here.
 #Chi tiet danh muc trong trang admin
 class ProductInline(admin.TabularInline):
@@ -10,34 +17,69 @@ class ProductInline(admin.TabularInline):
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [ProductInline]
 #chi tiet order item trong trang admin
-
-    
-
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Customer)
 # admin.site.register(Category)
 admin.site.register(Product)
 
+# class OrderAdmin(admin.ModelAdmin):
+#     def customer_name(self, obj):
+#         return obj.customer.name if obj.customer else None
+#     customer_name.short_description = 'Khách hàng'
+    
+#     def date_ordered(self, obj):
+#         return obj.date_ordered
+#     date_ordered.short_description = 'Ngày đặt hàng'
+    
+#     def detail(self, obj):
+#         url = reverse('view_order', args=[obj.id])
+#         return format_html('<a class="button" href="{}">Xem chi tiết</a>', url)
+#     detail.short_description = 'Chi tiết'  
+#     list_display = ['id', 'customer_name', 'date_ordered', 'detail']
+# admin.site.register(Order, OrderAdmin)
 class OrderAdmin(admin.ModelAdmin):
     def customer_name(self, obj):
         return obj.customer.name if obj.customer else None
     customer_name.short_description = 'Khách hàng'
-    
+
     def date_ordered(self, obj):
         return obj.date_ordered
     date_ordered.short_description = 'Ngày đặt hàng'
-    
+
     def detail(self, obj):
         url = reverse('view_order', args=[obj.id])
         return format_html('<a class="button" href="{}">Xem chi tiết</a>', url)
     detail.short_description = 'Chi tiết'
-    
-        
+
+
+
+    def export_invoice(modeladmin, request, queryset):
+    # Tạo danh sách chứa các đơn hàng được chọn
+        orders = list(queryset)
+        # Tạo context
+        context = {
+            'orders': orders
+        }
+        # Tạo tệp PDF từ template
+        html = render_to_string('store/view_order_detail.html', context)
+        result = BytesIO()
+        pdf = pisa.CreatePDF(BytesIO(html.encode('UTF-8')), result, encoding='UTF-8')
+        # Trả về tệp PDF
+        if not pdf.err:
+            response = HttpResponse(result.getvalue(), content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="invoices.pdf"'
+            return response
+        return HttpResponse('Error while creating PDF: %s' % pdf.err, status=400)
+
+
+    export_invoice.short_description = 'Xuất hoá đơn'
+    # Thêm action vào danh sách các action
+    actions = [export_invoice]
+
     list_display = ['id', 'customer_name', 'date_ordered', 'detail']
 
 admin.site.register(Order, OrderAdmin)
-# admin.site.register(OrderItem)
-# admin.site.register(ShippingAddree)
+
 
 class OrderItemDetailAdmin(admin.ModelAdmin):
     def order_id(self, obj):

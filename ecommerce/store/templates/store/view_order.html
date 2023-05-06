@@ -1,38 +1,40 @@
-<h2>Thông tin đơn hàng</h2>
-<p>Mã đơn hàng: {{ order.id }}</p>
-<p>Ngày đặt hàng: {{ order.date_ordered }}</p>
-<p>Khách hàng: {{ customer.name }}</p>
 
-<h3>Địa chỉ giao hàng</h3>
-{% for address in shipping_addresses %}
-    <p>Địa chỉ: {{ address.address }},
-    {{ address.city }},
-     {{ address.state }}
- </p>
-{% empty %}
-    <p>Chưa có địa chỉ giao hàng</p>
-{% endfor %}
 
-<h3>Danh sách sản phẩm</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Tên sản phẩm</th>
-            <th>Số lượng</th>
-            <th>Giá tiền</th>
-            <th>Thành tiền</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for order_item in order_items %}
+    <h2>Thông tin đơn hàng</h2>
+    <p>Mã đơn hàng: {{ order.id }}</p>
+    <p>Ngày đặt hàng: {{ order.date_ordered }}</p>
+    <p>Khách hàng: {{ order.customer.name }}</p>
+
+    <h3>Địa chỉ giao hàng</h3>
+    {% for address in order.get_shipping_addresses %}
+        <p>Địa chỉ: {{ address.address }},
+        {{ address.city }},
+         {{ address.state }}
+     </p>
+    {% empty %}
+        <p>Chưa có địa chỉ giao hàng</p>
+    {% endfor %}
+
+    <h3>Danh sách sản phẩm</h3>
+    <table>
+        <thead>
             <tr>
-                <td>{{ order_item.product.name }}</td>
-                <td>{{ order_item.quantity }}</td>
-                <td>{{ order_item.product.price }}</td>
-                <td>{{ order_item.get_total }}</td>
+                <th>Tên sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Giá tiền</th>
+                <th>Thành tiền</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for order_item in order.orderitem_set.all %}
+                <tr>
+                    <td>{{ order_item.product.name }}</td>
+                    <td>{{ order_item.quantity }}</td>
+                    <td>{{ order_item.product.price }}</td>
+                    <td>{{ order_item.get_total }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<h3>Tổng tiền: {{ order.get_cart_total }}</h3>
+    <h3>Tổng tiền:{{ order.get_cart_total }}<h3>

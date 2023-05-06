@@ -9,6 +9,11 @@ import json
 from . utils import cookieCart, cartData, guestOrder
 import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from django.template.loader import get_template
+from django.template import Context
+from django.http import HttpResponse
+from xhtml2pdf import pisa
 # Create your views here.
 
 def store(request):
@@ -199,8 +204,8 @@ def processOrder(request):
 #     return render(request, 'store/view_order.html', context)
 def view_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    order_items = OrderItem.get_order_items_by_order(order_id)
-
+    # order_items = OrderItem.get_order_items_by_order(order_id)
+    order_items = OrderItem.get_order_items_by_order(order).order_by('-date_added')
     # Truy vấn thông tin khách hàng và địa chỉ giao hàng
     customer = order.customer
     shipping_addresses = order.get_shipping_addresses()
@@ -213,3 +218,22 @@ def view_order(request, order_id):
     }
 
     return render(request, 'store/view_order.html', context)
+
+def view_order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    # order_items = OrderItem.get_order_items_by_order(order_id)
+    order_items = OrderItem.get_order_items_by_order(order).order_by('-date_added')
+    # Truy vấn thông tin khách hàng và địa chỉ giao hàng
+    customer = order.customer
+    shipping_addresses = order.get_shipping_addresses()
+
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'customer': customer,
+        'shipping_addresses': shipping_addresses,
+    }
+
+    return render(request, 'store/view_order_detail.html', context)
+
+

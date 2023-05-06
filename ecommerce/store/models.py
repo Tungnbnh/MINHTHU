@@ -124,9 +124,9 @@ class OrderItem(models.Model):
     # @staticmethod
     # def get_order_items_by_order(order_id):
     #     return OrderItem.objects.filter(order_id=order_id)
-    @staticmethod
-    def get_order_items_by_order(order_id):
-        order_items = OrderItem.objects.filter(order__id=order_id)
+    @classmethod
+    def get_order_items_by_order(cls, order_id):
+        order_items = cls.objects.filter(order_id=order_id)
         return order_items
     
 class ShippingAddree(models.Model):
