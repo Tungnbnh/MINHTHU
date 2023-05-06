@@ -8,6 +8,8 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from django.template.loader import render_to_string
 from unidecode import unidecode
+
+from weasyprint import HTML
 # Register your models here.
 #Chi tiet danh muc trong trang admin
 class ProductInline(admin.TabularInline):
@@ -63,14 +65,11 @@ class OrderAdmin(admin.ModelAdmin):
         # Tạo tệp PDF từ template
         html = render_to_string('store/view_order_detail.html', context)
         result = BytesIO()
-        pdf = pisa.CreatePDF(BytesIO(html.encode('UTF-8')), result, encoding='UTF-8')
+        HTML(string=html, encoding='utf-8').write_pdf(target=result)
         # Trả về tệp PDF
-        if not pdf.err:
-            response = HttpResponse(result.getvalue(), content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="invoices.pdf"'
-            return response
-        return HttpResponse('Error while creating PDF: %s' % pdf.err, status=400)
-
+        response = HttpResponse(result.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="invoices.pdf"'
+        return response
 
     export_invoice.short_description = 'Xuất hoá đơn'
     # Thêm action vào danh sách các action
