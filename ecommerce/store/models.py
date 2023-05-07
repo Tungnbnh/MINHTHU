@@ -14,7 +14,8 @@ class Customer(models.Model):
         
         def __str__(self):
             return self.name
-        
+        class Meta:
+            verbose_name_plural = 'Customer Management'
     
 class Category(models.Model):
     name = models.CharField(max_length=200, null = True)
@@ -30,7 +31,8 @@ class Category(models.Model):
     def get_products(self):
         return Product.objects.filter(category=self)
    
-   
+    class Meta:
+        verbose_name_plural = 'Catalog Management'
     
     
     
@@ -50,7 +52,8 @@ class Product(models.Model):
         return self.name
     # neu ko co hinh anh duoc them vao thi co the bo qua 
 
-    
+    class Meta:
+        verbose_name_plural = 'Product Management'
     
     @property
     def imageURL(self):
@@ -99,7 +102,19 @@ class Order(models.Model):
         # OrderItem trong danh sách orderitems và gọi phương thức get_total trên mỗi mặt hàng.
         # Sau đó, nó cộng tất cả các tổng số mục riêng lẻ bằng cách sử dụng hàm sum() tích hợp sẵn.
         return total
-    
+    @property
+    def get_tax(self):
+        # Tính thuế 10%
+        total = self.get_cart_total
+        tax = total * 0.1
+        return tax 
+    @property
+    def get_total_amount(self):
+        # Tính tổng cộng tiền và thuế
+        total = self.get_cart_total
+        tax = self.get_tax
+        total_amount = total + tax
+        return total_amount
     @property
     def get_cart_items(self):
         orderitems = self.orderitem_set.all()
@@ -109,6 +124,9 @@ class Order(models.Model):
     def get_shipping_addresses(self):
         shipping_addresses = ShippingAddree.objects.filter(order=self)
         return shipping_addresses
+    
+    class Meta:
+        verbose_name_plural = 'Order Management'
     
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, null=True, on_delete=models.SET_NULL, blank=True)
@@ -145,3 +163,5 @@ class ShippingAddree(models.Model):
         order_items = OrderItem.objects.filter(order=self.order)
         return order_items
 
+    class Meta:
+        verbose_name_plural = 'Address Management'

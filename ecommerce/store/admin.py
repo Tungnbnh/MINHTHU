@@ -22,7 +22,12 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Customer)
 # admin.site.register(Category)
+class ProductAdmin(admin.ModelAdmin):
+    
+    verbose_name_plural = 'Manage Product'
+
 admin.site.register(Product)
+
 
 # class OrderAdmin(admin.ModelAdmin):
 #     def customer_name(self, obj):

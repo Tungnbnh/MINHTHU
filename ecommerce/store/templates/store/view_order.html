@@ -1,40 +1,123 @@
 
-
-    <h2>Thông tin đơn hàng</h2>
-    <p>Mã đơn hàng: {{ order.id }}</p>
-    <p>Ngày đặt hàng: {{ order.date_ordered }}</p>
-    <p>Khách hàng: {{ order.customer.name }}</p>
-
-    <h3>Địa chỉ giao hàng</h3>
-    {% for address in order.get_shipping_addresses %}
-        <p>Địa chỉ: {{ address.address }},
-        {{ address.city }},
-         {{ address.state }}
-     </p>
-    {% empty %}
-        <p>Chưa có địa chỉ giao hàng</p>
-    {% endfor %}
-
-    <h3>Danh sách sản phẩm</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Tên sản phẩm</th>
-                <th>Số lượng</th>
-                <th>Giá tiền</th>
-                <th>Thành tiền</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order_item in order.orderitem_set.all %}
-                <tr>
-                    <td>{{ order_item.product.name }}</td>
-                    <td>{{ order_item.quantity }}</td>
-                    <td>{{ order_item.product.price }}</td>
-                    <td>{{ order_item.get_total }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h3>Tổng tiền:{{ order.get_cart_total }}<h3>
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/invoice.css' %}">
+</head>
+<body>
+    <section>
+        <div class="invoice">
+          <div class="invoice_info">
+            <div style="" class="title">
+                <h1 style="text-align: center">HOÁ ĐƠN</h1>
+            </div>
+            
+            <div class="i_row">
+      
+              <div class="i_to">
+                <div class="main_title">
+                  <p>Đơn Hàng Đến </p>
+                </div>
+                <div class="p_title">
+                    <p>Khách hàng: {{ order.customer.name }}</p>
+                    
+                    {% for address in order.get_shipping_addresses %}
+                        <p>Địa chỉ: {{ address.address }},
+                        {{ address.city }},
+                        {{ address.state }}
+                    </p>
+                    {% empty %}
+                        <p>Chưa có địa chỉ giao hàng</p>
+                    {% endfor %}
+                </div>
+                
+              </div>
+              <div class="i_details text_right">
+                <div class="main_title">
+                  <p>Chi Tiết hoá đơn</p>
+                </div>
+                <div class="p_title">
+                  <p>Hoá đơn số:</p>
+                  <span>{{ order.id }}</span>
+                </div>
+                <div class="p_title">
+                  <p>Ngày đặt hàng:</p>
+                  <span>{{ order.date_ordered }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="invoice_table">
+            <div class="i_table">
+                <table class = "i_table fix" style ="width: 720px; border:1px dashed var(--primary-clr);border-bottom: none">
+                    <div>
+                        <tr>
+                            <th>Tên sản phẩm </th>
+                            <th>Số lượng</th>
+                            <th>Giá tiền</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </div>
+                    <tbody>
+                        {% for order_item in order.orderitem_set.all %}
+                            <tr style="text-align: center">
+                                <td style="text-align: center">{{ order_item.product.name }}</td>
+                                <td>{{ order_item.quantity }}</td>
+                                <td>{{ order_item.product.price }}</td>
+                                <td>{{ order_item.get_total }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+              <div class="i_table_foot">
+                <div class="i_row">
+                  <div class="i_col w_50">
+                    <p>Tổng tiền:</p>
+                    
+                    <p>Tax 10%</p>
+                  </div>
+                  <div class="i_col w_50 text_right">
+                    <p>{{ order.get_cart_total|floatformat:0|intcomma}} đ</p>
+                    
+                    <p>{{ order.get_tax|floatformat:0|intcomma}} đ</p>
+                  </div>
+                </div>
+                <div class="i_row grand_total_wrap">
+                  <div class="i_col w_50">
+                    <p>Tổng hoá đơn:</p>
+                  </div>
+                  <div class="i_col w_50 text_right">
+                    <p>{{order.get_total_amount|floatformat:0|intcomma}} đ</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+      
+          </div>
+          <div class="invoice_payment">
+            <div class="i_row">
+              <div class="i_payment">
+                <div class="main_title">
+                  <p>Phương thức thanh toán</p>
+                </div>
+                <div class="p_title">
+                  <p>Thanh toán khi nhận hàng:</p>
+                  <span>Tiền mặt ..</span>
+                </div>
+                <div class="p_title">
+                  <p>Thanh toán online:</p>
+                  <span>Visa, MasterCard, Paypal</span>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+    </section>
+</body>
+</html>

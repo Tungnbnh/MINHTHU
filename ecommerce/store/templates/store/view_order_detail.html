@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -17,49 +18,245 @@
         body {
             font-family: "Arial Unicode MS", Arial, sans-serif;
         }
+        @import url("https://fonts.googleapis.com/css2?family=Redressed&family=Ubuntu:wght@400;700&display=swap");
+        :root {
+            --bg-clr: #b3b3b3;
+            --white: #fff;
+            --invoice-bg: #red;
+            --primary-clr: #2f2929;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Ubuntu", sans-serif;
+        }
+
+        body {
+            background: var(--bg-clr);
+            font-size: 12px;
+            line-height: 20px;
+            color: var(--primary-clr);
+            padding: 0 20px;
+        }
+
+        .main_title {
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            color: var(--primary-clr);
+            margin-bottom: 10px;
+        }
+
+        .p_title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .p_title>span {
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        .text_right {
+            text-align: right;
+        }
+
+        .text_center {
+            text-align: center;
+        }
+
+        .i_row {
+            display: flex;
+        }
+
+        .invoice {
+            width: 800px;
+            max-width: 100%;
+            height: auto;
+            background: var(--white);
+            margin: 20px auto;
+        }
+
+        .invoice>div {
+            width: 100%;
+            padding: 40px;
+        }
+
+        .invoice .invoice_info .i_row,
+        .invoice .invoice_payment .i_row {
+            justify-content: space-between;
+        }
+
+        .invoice .invoice_info,
+        .invoice .invoice_terms,
+        .invoice .invoice_payment {
+            background: var(--invoice-bg);
+        }
+
+        .invoice .invoice_payment {
+            border-bottom: 1px dashed var(--primary-clr);
+        }
+
+        .invoice .invoice_info>div:not(:last-child) {
+            margin-bottom: 40px;
+        }
+
+        .invoice .invoice_info h1 {
+            font-size: 38px;
+            line-height: 44px;
+            color: var(--primary-clr);
+        }
+
+        .invoice .w_15 {
+            width: 15%;
+        }
+
+        .invoice .w_50 {
+            width: 50%;
+        }
+
+        .invoice .w_55 {
+            width: 55%;
+        }
+
+        .invoice .i_table .i_row {
+            padding: 12px 10px;
+            border: 1px dashed var(--primary-clr);
+            border-bottom: 0;
+        }
+
+        .invoice .i_table .i_table_foot .i_row:last-child {
+            border-bottom: 1px dashed var(--primary-clr);
+        }
+
+        .invoice .i_table .i_row p {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .invoice .i_table .i_table_head .i_row,
+        .invoice .i_table .i_table_foot .grand_total_wrap {
+            background: var(--invoice-bg);
+        }
+
+        .invoice .invoice_right .terms {
+            margin: 0;
+        }
     </style>
     
 </head>
 <body >
     {% for order in orders%}
-        <h2>Thong tin don hang</h2>
-        <p>Ma don hang: {{ order.id }}</p>
-        <p>Ngay dat hang: {{ order.date_ordered }}</p>
-        <p>Khach hang: {{ order.customer.name }}</p>
-
-        <h3>Dia chi giao hang</h3>
-        {% for address in order.get_shipping_addresses %}
-            <p>Dia chi: {{ address.address }},
-            {{ address.city }},
-            {{ address.state }}
-        </p>
-        {% empty %}
-            <p>Chưa có địa chỉ giao hàng</p>
-        {% endfor %}
-
-        <h3>Danh sach san pham</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Ten san pham</th>
-                    <th>So Luong</th>
-                    <th>Gia tien</th>
-                    <th>Thanh tien</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order_item in order.orderitem_set.all %}
-                    <tr>
-                        <td>{{ order_item.product.name }}</td>
-                        <td>{{ order_item.quantity }}</td>
-                        <td>{{ order_item.product.price }}</td>
-                        <td>{{ order_item.get_total }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <h3>Tong tien:{{ order.get_cart_total }}</h3>
+        <section>
+            <div class="invoice">
+            <div class="invoice_info">
+                <div style="" class="title">
+                    <h1 style="text-align: center">HOÁ ĐƠN</h1>
+                </div>
+                
+                <div class="i_row">
+        
+                <div class="i_to">
+                    <div class="main_title">
+                    <p>Đơn Hàng Đến </p>
+                    </div>
+                    <div class="p_title">
+                        <p>Khách hàng: {{ order.customer.name }}</p>
+                        
+                        {% for address in order.get_shipping_addresses %}
+                            <p>Địa chỉ: {{ address.address }},
+                            {{ address.city }},
+                            {{ address.state }}
+                        </p>
+                        {% empty %}
+                            <p>Chưa có địa chỉ giao hàng</p>
+                        {% endfor %}
+                    </div>
+                    
+                </div>
+                <div class="i_details text_right">
+                    <div class="main_title">
+                    <p>Chi Tiết hoá đơn</p>
+                    </div>
+                    <div class="p_title">
+                    <p>Hoá đơn số:</p>
+                    <span>{{ order.id }}</span>
+                    </div>
+                    <div class="p_title">
+                    <p>Ngày đặt hàng:</p>
+                    <span>{{ order.date_ordered }}</span>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="invoice_table" >
+                <div class="i_table" style ="border:1px dashed black">
+                    <table class = "i_table fix" style ="width: 600px">
+                        <div>
+                            <tr>
+                                <th>Tên sản phẩm </th>
+                                <th>Số lượng</th>
+                                <th>Giá tiền</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </div>
+                        <tbody>
+                            {% for order_item in order.orderitem_set.all %}
+                                <tr style="">
+                                    <td style="">{{ order_item.product.name }}</td>
+                                    <td>{{ order_item.quantity }}</td>
+                                    <td>{{ order_item.product.price }}</td>
+                                    <td>{{ order_item.get_total }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                <div class="i_table_foot" style ="border:1px dashed black">
+                    <div class="i_row">
+                    <div class="i_col w_50">
+                        <p>Tổng tiền:</p>
+                        
+                        <p>Tax 10%</p>
+                    </div>
+                    <div class="i_col w_50 text_right">
+                        <p>{{ order.get_cart_total|floatformat:0|intcomma}} đ</p>
+                        
+                        <p>{{ order.get_tax|floatformat:0|intcomma}} đ</p>
+                    </div>
+                    </div>
+                    <div class="i_row grand_total_wrap">
+                    <div class="i_col w_50">
+                        <p>Tổng hoá đơn:</p>
+                    </div>
+                    <div class="i_col w_50 text_right">
+                        <p>{{order.get_total_amount|floatformat:0|intcomma}} đ</p>
+                    </div>
+                    </div>
+                </div>
+                </div>
+        
+            </div>
+            <div class="invoice_payment">
+                <div class="i_row">
+                <div class="i_payment">
+                    <div class="main_title">
+                    <p>Phương thức thanh toán</p>
+                    </div>
+                    <div class="p_title">
+                    <p>Thanh toán khi nhận hàng:</p>
+                    <span>Tiền mặt ..</span>
+                    </div>
+                    <div class="p_title">
+                    <p>Thanh toán online:</p>
+                    <span>Visa, MasterCard, Paypal</span>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+        </section>
 
     {% endfor %}
 </body>
